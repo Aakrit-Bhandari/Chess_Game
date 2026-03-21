@@ -1,19 +1,26 @@
-import { useCallback, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { BOARD_COLUMNS, BOARD_ROWS } from "../constants";
 import styles from "./Board.module.css";
 import { ChessBoard } from "./ChessBoard";
+import type { IPlayerTurn } from "./types";
 import { getCellData } from "./utils";
 export default function BoardComponent() {
   const board = useMemo(() => new ChessBoard(), []);
+  const [playerTurn, setPlayerTurn] = useState<IPlayerTurn>("white");
   const [, forceRender] = useState(0);
 
-  const performCalculation = useCallback(
-    (rowIdx: number, colIdx: number): void => {
-      board.performCalculation(rowIdx, colIdx);
-      forceRender((prev) => prev + 1);
-    },
-    [board],
-  );
+  const performCalculation = (
+    rowIdx: number,
+    colIdx: number,
+    side: IPlayerTurn,
+  ): void => {
+    console.log(side);
+    if (side !== playerTurn && side !== undefined) return;
+    if (board.performCalculation(rowIdx, colIdx)) {
+      setPlayerTurn(playerTurn === "white" ? "black" : "white");
+    }
+    forceRender((prev) => prev + 1);
+  };
 
   return (
     <div className={styles.chessBoard}>
@@ -31,7 +38,7 @@ export default function BoardComponent() {
             <div
               className={`${styles.cell} ${isCaptureable ? styles.captureable : ""} ${darkCell ? styles.darkCell : ""} ${selected ? styles.selected : ""}`}
               key={`${rowIndex}-${colIndex}`}
-              onClick={() => performCalculation(rowIndex, colIndex)}
+              onClick={() => performCalculation(rowIndex, colIndex, side)}
             >
               <div
                 className={styles.piece}
@@ -42,7 +49,7 @@ export default function BoardComponent() {
             </div>
           ) : (
             <div
-              onClick={() => performCalculation(rowIndex, colIndex)}
+              onClick={() => performCalculation(rowIndex, colIndex, side)}
               className={`${styles.cell} ${highLighted ? styles.highLighted : ""} ${darkCell ? styles.darkCell : ""}`}
               key={`${rowIndex}-${colIndex}`}
             />

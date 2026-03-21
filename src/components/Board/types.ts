@@ -11,6 +11,8 @@ export interface IChessCell {
   isCaptureable: boolean;
 }
 
+export type IPlayerTurn = "white" | "black" | "";
+
 export interface IChessBoard {
   cells: IChessCell[][];
 }

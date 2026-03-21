@@ -20,11 +20,6 @@ export class ChessBoard {
       this.cells.push([]);
       for (let j = 0; j < BOARD_COLUMNS; j++) {
         this.cells[i][j] = this.allocateCell(i, j, darkCell) as IChessCell;
-        if (i === 2 && j == 3) {
-          this.cells[i][j].piece = "knight";
-          this.cells[i][j].side = "white";
-          this.cells[i][j].isEmpty = false;
-        }
         darkCell = !darkCell;
       }
       darkCell = !darkCell;
@@ -288,6 +283,19 @@ export class ChessBoard {
     }
   }
   //Knight path
+  private knightCommonCalculation(
+    rowIdx: number,
+    colIdx: number,
+    attackerCell: IChessCell,
+  ): void {
+    if (this.isValidPosition(rowIdx, colIdx)) {
+      const attackedCell = this.cells[rowIdx][colIdx];
+      if (attackedCell.isEmpty) {
+        attackedCell.isHighLighted = true;
+      }
+      this.captureCell(attackedCell, attackerCell);
+    }
+  }
   private moveToBottomLeftDirection(rowIdx: number, colIdx: number): void {
     const dir = [1, 2, -1, -2];
     const currentCell = this.cells[rowIdx][colIdx];
@@ -297,20 +305,8 @@ export class ChessBoard {
 
     const firstLeft = colIdx + dir[3];
     const secondLeft = colIdx + dir[2];
-    if (this.isValidPosition(firstBottom, firstLeft)) {
-      const bottomLeftCell = this.cells[firstBottom][firstLeft];
-      if (bottomLeftCell.isEmpty) {
-        bottomLeftCell.isHighLighted = true;
-      }
-      this.captureCell(bottomLeftCell, currentCell);
-    }
-    if (this.isValidPosition(secondBottom, secondLeft)) {
-      const bottomLeftCell = this.cells[secondBottom][secondLeft];
-      if (bottomLeftCell.isEmpty) {
-        bottomLeftCell.isHighLighted = true;
-      }
-      this.captureCell(bottomLeftCell, currentCell);
-    }
+    this.knightCommonCalculation(firstBottom, firstLeft, currentCell);
+    this.knightCommonCalculation(secondBottom, secondLeft, currentCell);
   }
   private moveToBottomRightDirection(rowIdx: number, colIdx: number): void {
     const dir = [1, 2, -1, -2];
@@ -321,20 +317,8 @@ export class ChessBoard {
     const firstRight = colIdx + dir[1];
     const seconRight = colIdx + dir[0];
     //
-    if (this.isValidPosition(firstBottom, firstRight)) {
-      const rightCell = this.cells[firstBottom][firstRight];
-      if (rightCell.isEmpty) {
-        rightCell.isHighLighted = true;
-      }
-      this.captureCell(rightCell, currentCell);
-    }
-    if (this.isValidPosition(secondBottom, seconRight)) {
-      const rightCell = this.cells[secondBottom][seconRight];
-      if (rightCell.isEmpty) {
-        rightCell.isHighLighted = true;
-      }
-      this.captureCell(rightCell, currentCell);
-    }
+    this.knightCommonCalculation(firstBottom, firstRight, currentCell);
+    this.knightCommonCalculation(secondBottom, seconRight, currentCell);
   }
   private moveToTopLeftDirection(rowIdx: number, colIdx: number): void {
     const dir = [1, 2, -1, -2];
@@ -344,20 +328,8 @@ export class ChessBoard {
 
     const firstLeft = colIdx + dir[3];
     const secondLeft = colIdx + dir[2];
-    if (this.isValidPosition(firstTop, firstLeft)) {
-      const topLeftCell = this.cells[firstTop][firstLeft];
-      if (topLeftCell.isEmpty) {
-        topLeftCell.isHighLighted = true;
-      }
-      this.captureCell(topLeftCell, currentCell);
-    }
-    if (this.isValidPosition(secondTop, secondLeft)) {
-      const topLeftCell = this.cells[secondTop][secondLeft];
-      if (topLeftCell.isEmpty) {
-        topLeftCell.isHighLighted = true;
-      }
-      this.captureCell(topLeftCell, currentCell);
-    }
+    this.knightCommonCalculation(firstTop, firstLeft, currentCell);
+    this.knightCommonCalculation(secondTop, secondLeft, currentCell);
   }
   private moveToTopRightDirection(rowIdx: number, colIdx: number): void {
     const dir = [1, 2, -1, -2];
@@ -367,20 +339,8 @@ export class ChessBoard {
 
     const firstRight = colIdx + dir[1];
     const secondRight = colIdx + dir[0];
-    if (this.isValidPosition(firstTop, firstRight)) {
-      const topRightCell = this.cells[firstTop][firstRight];
-      if (topRightCell.isEmpty) {
-        topRightCell.isHighLighted = true;
-      }
-      this.captureCell(topRightCell, currentCell);
-    }
-    if (this.isValidPosition(secondTop, secondRight)) {
-      const topRightCell = this.cells[secondTop][secondRight];
-      if (topRightCell.isEmpty) {
-        topRightCell.isHighLighted = true;
-      }
-      this.captureCell(topRightCell, currentCell);
-    }
+    this.knightCommonCalculation(firstTop, firstRight, currentCell);
+    this.knightCommonCalculation(secondTop, secondRight, currentCell);
   }
   //Pawn path
   private pawnCalculation(rowIdx: number, colIdx: number): void {
@@ -459,21 +419,26 @@ export class ChessBoard {
     }
   }
   //Calculation of paths and captures in
-  public performCalculation(rowIdx: number, colIdx: number): void {
+  public performCalculation(rowIdx: number, colIdx: number): boolean {
     const cell = this.cells[rowIdx][colIdx];
+    console.log(cell);
     if (cell.isEmpty && cell.isHighLighted) {
+      console.log("makemove");
       this.makeMove(rowIdx, colIdx);
-      return;
+      return true;
     }
     if (cell.isCaptureable) {
+      console.log("makecapture");
       this.makeCapture(rowIdx, colIdx);
-      return;
+      return true;
     }
     if (cell.isEmpty) {
+      console.log("resetpossiblemoves");
       this.resetPossibleMoves();
-      return;
+      return false;
     }
     this.resetPossibleMoves();
+    console.log("resetpossiblemoves");
     cell.isSelected = true;
     switch (cell.piece) {
       case "pawn":
@@ -497,6 +462,7 @@ export class ChessBoard {
       default:
         break;
     }
+    return false;
   }
 
   private rookCalculation(rowIdx: number, colIdx: number): void {
