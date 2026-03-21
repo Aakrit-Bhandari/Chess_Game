@@ -42,6 +42,7 @@ export default function BoardComponent() {
             </div>
           ) : (
             <div
+              onClick={() => performCalculation(rowIndex, colIndex)}
               className={`${styles.cell} ${highLighted ? styles.highLighted : ""} ${darkCell ? styles.darkCell : ""}`}
               key={`${rowIndex}-${colIndex}`}
             />

@@ -2,8 +2,8 @@ export interface IChessCell {
   piece: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "";
   side: "black" | "white" | "";
   row: number;
-  plateColor:boolean;//light true, dark false
   column: number;
+  plateColor:boolean;//light true, dark false
   isEmpty: boolean;
   isSelected: boolean;
   isHighLighted: boolean;

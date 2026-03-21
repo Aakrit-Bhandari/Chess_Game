@@ -20,11 +20,11 @@ export class ChessBoard {
       this.cells.push([]);
       for (let j = 0; j < BOARD_COLUMNS; j++) {
         this.cells[i][j] = this.allocateCell(i, j, darkCell) as IChessCell;
-        if (i === 5 && j == 3) {
-          this.cells[i][j].piece = "king";
-          this.cells[i][j].side = "black";
-          this.cells[i][j].isEmpty = false;
-        }
+        // if (i === 3 && j == 3) {
+        //   this.cells[i][j].piece = "knight";
+        //   this.cells[i][j].side = "white";
+        //   this.cells[i][j].isEmpty = false;
+        // }
         darkCell = !darkCell;
       }
       darkCell = !darkCell;
@@ -402,9 +402,36 @@ export class ChessBoard {
       walkingStep--;
     }
   }
+  //Make Moves
+  private checkIfPossible(targetCell: IChessCell, initialCell: IChessCell) {
+    targetCell.piece = initialCell.piece;
+    targetCell.side = initialCell.side;
+    targetCell.isEmpty = false;
+    targetCell.isHighLighted = false;
+    initialCell.piece = "";
+    initialCell.side = "";
+    initialCell.isEmpty = true;
+    console.log(targetCell.piece);
+  }
+  private makeMove(rowIdx: number, colIdx: number) {
+    const moveAbleCell = this.cells[rowIdx][colIdx];
+    for (let i = 0; i < BOARD_ROWS; i++) {
+      for (let j = 0; j < BOARD_COLUMNS; j++) {
+        const cell = this.cells[i][j];
+        if (cell.isSelected && !cell.isEmpty) {
+          this.checkIfPossible(moveAbleCell, cell);
+          break;
+        }
+      }
+    }
+  }
   //Calculation of paths and captures in
   public performCalculation(rowIdx: number, colIdx: number): void {
     const cell = this.cells[rowIdx][colIdx];
+    if (cell.isEmpty) {
+      this.makeMove(rowIdx, colIdx);
+      return;
+    }
     this.resetPossibleMoves(rowIdx, colIdx);
     switch (cell.piece) {
       case "pawn":

@@ -9,3 +9,6 @@ export const getCellData = (cell: IChessCell): ICellData => {
   const selected = cell.isSelected;
   return { side, piece, isCaptureable, highLighted, darkCell, selected };
 };
+
+// export const makeClass = (cell: IChessCell, styles: CSSModuleClasses) => {
+// };
