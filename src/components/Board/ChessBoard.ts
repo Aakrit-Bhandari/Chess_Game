@@ -108,16 +108,13 @@ export class ChessBoard {
     } as IChessCell;
   }
   //Reset the grid when new Cell is selected
-  public resetPossibleMoves(rowIdx: number, colIdx: number): void {
+  public resetPossibleMoves(): void {
     for (let row = 0; row < BOARD_ROWS; row++) {
       for (let col = 0; col < BOARD_COLUMNS; col++) {
         const cell = this.cells[row][col];
         cell.isCaptureable = false;
         cell.isHighLighted = false;
         cell.isSelected = false;
-        if (row == rowIdx && col == colIdx) {
-          cell.isSelected = true;
-        }
       }
     }
   }
@@ -137,8 +134,11 @@ export class ChessBoard {
   }
   private commonCellValidation(
     cell: IChessCell,
-    currentCell: IChessCell,
+    rowIdx: number,
+    colIdx: number,
   ): void {
+    if (!this.isValidPosition(rowIdx, colIdx)) return;
+    const currentCell = this.cells[rowIdx][colIdx];
     if (currentCell.isEmpty) {
       currentCell.isHighLighted = true;
     } else {
@@ -151,24 +151,24 @@ export class ChessBoard {
   private moveKingLeftDirection(rowIdx: number, colIdx: number): void {
     const currentCell = this.cells[rowIdx][colIdx];
     const finalCol = colIdx - 1;
-    this.commonCellValidation(currentCell, this.cells[rowIdx][finalCol]);
-    this.commonCellValidation(currentCell, this.cells[rowIdx + 1][finalCol]);
-    this.commonCellValidation(currentCell, this.cells[rowIdx - 1][finalCol]);
+    this.commonCellValidation(currentCell, rowIdx, finalCol);
+    this.commonCellValidation(currentCell, rowIdx + 1, finalCol);
+    this.commonCellValidation(currentCell, rowIdx - 1, finalCol);
   }
   private moveKingRightDirection(rowIdx: number, colIdx: number): void {
     const currentCell = this.cells[rowIdx][colIdx];
     const finalCol = colIdx + 1;
-    this.commonCellValidation(currentCell, this.cells[rowIdx][finalCol]);
-    this.commonCellValidation(currentCell, this.cells[rowIdx + 1][finalCol]);
-    this.commonCellValidation(currentCell, this.cells[rowIdx - 1][finalCol]);
+    this.commonCellValidation(currentCell, rowIdx, finalCol);
+    this.commonCellValidation(currentCell, rowIdx + 1, finalCol);
+    this.commonCellValidation(currentCell, rowIdx - 1, finalCol);
   }
   private moveKingTopDirection(rowIdx: number, colIdx: number): void {
     const currentCell = this.cells[rowIdx][colIdx];
-    this.commonCellValidation(currentCell, this.cells[rowIdx - 1][colIdx]);
+    this.commonCellValidation(currentCell, rowIdx - 1, colIdx);
   }
   private moveKingBottomDirection(rowIdx: number, colIdx: number): void {
     const currentCell = this.cells[rowIdx][colIdx];
-    this.commonCellValidation(currentCell, this.cells[rowIdx + 1][colIdx]);
+    this.commonCellValidation(currentCell, rowIdx + 1, colIdx);
   }
   //Rook and Queen path
   private moveBottomDirection(rowIdx: number, colIdx: number): void {
@@ -407,11 +407,21 @@ export class ChessBoard {
     targetCell.piece = initialCell.piece;
     targetCell.side = initialCell.side;
     targetCell.isEmpty = false;
-    targetCell.isHighLighted = false;
     initialCell.piece = "";
     initialCell.side = "";
     initialCell.isEmpty = true;
-    console.log(targetCell.piece);
+    this.resetPossibleMoves();
+  }
+  private makeCapturePossible(
+    targetCell: IChessCell,
+    attackerCell: IChessCell,
+  ): void {
+    targetCell.piece = attackerCell.piece;
+    attackerCell.piece = "";
+    attackerCell.isEmpty = true;
+    targetCell.side = attackerCell.side;
+    attackerCell.side = "";
+    this.resetPossibleMoves();
   }
   private makeMove(rowIdx: number, colIdx: number) {
     const moveAbleCell = this.cells[rowIdx][colIdx];
@@ -425,14 +435,34 @@ export class ChessBoard {
       }
     }
   }
+  private makeCapture(rowIdx: number, colIdx: number): void {
+    const capturableCell = this.cells[rowIdx][colIdx];
+    for (let i = 0; i < BOARD_ROWS; i++) {
+      for (let j = 0; j < BOARD_COLUMNS; j++) {
+        const cell = this.cells[i][j];
+        if (cell.isSelected) {
+          this.makeCapturePossible(capturableCell, cell);
+        }
+      }
+    }
+  }
   //Calculation of paths and captures in
   public performCalculation(rowIdx: number, colIdx: number): void {
     const cell = this.cells[rowIdx][colIdx];
-    if (cell.isEmpty) {
+    console.log(cell);
+    if (cell.isEmpty && cell.isHighLighted) {
       this.makeMove(rowIdx, colIdx);
       return;
     }
-    this.resetPossibleMoves(rowIdx, colIdx);
+    if (cell.isCaptureable) {
+      this.makeCapture(rowIdx, colIdx);
+      return;
+    }
+    if (cell.isEmpty) {
+      return;
+    }
+    this.resetPossibleMoves();
+    cell.isSelected = true;
     switch (cell.piece) {
       case "pawn":
         this.pawnCalculation(rowIdx, colIdx);
