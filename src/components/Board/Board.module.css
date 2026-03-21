@@ -1,0 +1,44 @@
+.chessBoard {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 800px;
+  height: 800px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+.piece {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 95%;
+  height: 95%;
+}
+.highLighted {
+  background: url("../../assets/allowedPath.png") no-repeat center center;
+  background-size: 50%;
+}
+
+.cell {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-size: 50%;
+  background-color: rgb(235, 236, 208);
+}
+
+.darkCell {
+  background-color: rgb(115, 149, 82);
+}
+
+.selected {
+  background-color: rgb(252, 252, 122);
+}
+
+.captureable {
+  background: radial-gradient(circle at center, #ffffff 10%, #ff0000 100%);
+
+}
