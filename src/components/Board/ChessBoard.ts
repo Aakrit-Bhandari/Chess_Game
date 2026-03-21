@@ -20,11 +20,11 @@ export class ChessBoard {
       this.cells.push([]);
       for (let j = 0; j < BOARD_COLUMNS; j++) {
         this.cells[i][j] = this.allocateCell(i, j, darkCell) as IChessCell;
-        // if (i === 3 && j == 3) {
-        //   this.cells[i][j].piece = "knight";
-        //   this.cells[i][j].side = "white";
-        //   this.cells[i][j].isEmpty = false;
-        // }
+        if (i === 2 && j == 3) {
+          this.cells[i][j].piece = "knight";
+          this.cells[i][j].side = "white";
+          this.cells[i][j].isEmpty = false;
+        }
         darkCell = !darkCell;
       }
       darkCell = !darkCell;
@@ -386,20 +386,32 @@ export class ChessBoard {
   private pawnCalculation(rowIdx: number, colIdx: number): void {
     const currentCell = this.cells[rowIdx][colIdx];
     const side = currentCell.side;
+    let row = rowIdx;
     const isInitial = side === "black" ? rowIdx === 1 : rowIdx === 6;
     const forward = side === "black" ? 1 : -1;
     const step = isInitial ? 2 * forward : 1 * forward;
     let walkingStep = Math.abs(step);
-    while (rowIdx >= 0 && rowIdx < BOARD_ROWS && walkingStep > 0) {
-      const nextCell = this.cells[rowIdx + forward][colIdx];
+    while (row >= 0 && row < BOARD_ROWS && walkingStep > 0) {
+      const nextCell = this.cells[row + forward][colIdx];
       if (nextCell.isEmpty) {
         nextCell.isHighLighted = true;
       } else {
-        this.captureCell(nextCell, currentCell);
         break;
       }
-      rowIdx += forward;
+      row += forward;
       walkingStep--;
+    }
+    if (this.isValidPosition(rowIdx + forward, colIdx - 1)) {
+      const adjacentCell = this.cells[rowIdx + forward][colIdx - 1];
+      if (!adjacentCell.isEmpty && adjacentCell.side !== side) {
+        this.captureCell(adjacentCell, currentCell);
+      }
+    }
+    if (this.isValidPosition(rowIdx + forward, colIdx + 1)) {
+      const adjacentCell = this.cells[rowIdx + forward][colIdx + 1];
+      if (!adjacentCell.isEmpty && adjacentCell.side !== side) {
+        this.captureCell(adjacentCell, currentCell);
+      }
     }
   }
   //Make Moves
@@ -449,7 +461,6 @@ export class ChessBoard {
   //Calculation of paths and captures in
   public performCalculation(rowIdx: number, colIdx: number): void {
     const cell = this.cells[rowIdx][colIdx];
-    console.log(cell);
     if (cell.isEmpty && cell.isHighLighted) {
       this.makeMove(rowIdx, colIdx);
       return;
@@ -459,6 +470,7 @@ export class ChessBoard {
       return;
     }
     if (cell.isEmpty) {
+      this.resetPossibleMoves();
       return;
     }
     this.resetPossibleMoves();
