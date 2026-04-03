@@ -71,3 +71,5 @@ export default defineConfig([
   },
 ])
 ```
+Game Picture
+<img width="904" height="900" alt="image" src="https://github.com/user-attachments/assets/f6301352-abc8-4737-9e82-ccb0344bba1b" />
