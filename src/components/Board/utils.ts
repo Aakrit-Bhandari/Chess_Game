@@ -1,4 +1,4 @@
-import type { ICellData, IChessCell } from "./types";
+import type { ICellData, IChessCell } from "../class/types";
 
 export const getCellData = (cell: IChessCell): ICellData => {
   const side = cell.side;

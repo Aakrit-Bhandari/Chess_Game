@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
+import { ChessBoard } from "../class/chessBoard/ChessBoard";
+import type { IPlayerTurn } from "../class/types";
 import { BOARD_COLUMNS, BOARD_ROWS } from "../constants";
 import styles from "./Board.module.css";
-import { ChessBoard } from "./ChessBoard";
-import type { IPlayerTurn } from "./types";
 import { getCellData } from "./utils";
 export default function BoardComponent() {
-  const board = useMemo(() => new ChessBoard(), []);
+  const board = useMemo(() => ChessBoard.getInstance(), []);
   const [playerTurn, setPlayerTurn] = useState<IPlayerTurn>("white");
   const [, forceRender] = useState(0);
 
@@ -14,8 +14,8 @@ export default function BoardComponent() {
     colIdx: number,
     side: IPlayerTurn,
   ): void => {
-    console.log(side);
-    if (side !== playerTurn && side !== undefined) return;
+    const cell = board.cells[rowIdx][colIdx];
+    if (side && side !== playerTurn && !cell.isCaptureable) return;
     if (board.performCalculation(rowIdx, colIdx)) {
       setPlayerTurn(playerTurn === "white" ? "black" : "white");
     }
