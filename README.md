@@ -123,3 +123,6 @@ The game logic follows a **singleton board + strategy-per-piece** pattern:
 ## License
 
 This project is unlicensed. Feel free to use it for learning and experimentation.
+
+Game Picture
+<img width="904" height="900" alt="image" src="https://github.com/user-attachments/assets/f6301352-abc8-4737-9e82-ccb0344bba1b" />
