@@ -1,73 +1,125 @@
-# React + TypeScript + Vite
+# Chess
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A browser-based chess game built from scratch with React and TypeScript. Play a full two-player game on a single screen — select pieces, see legal moves highlighted, and capture opponents with enforced turn order.
 
-Currently, two official plugins are available:
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- **Interactive chessboard** — 8×8 grid with piece sprites and alternating light/dark squares
+- **Full piece movement** — all six piece types (Pawn, Rook, Knight, Bishop, Queen, King) with their standard movement rules
+- **Legal move highlighting** — click a piece to see available moves and capturable squares
+- **Turn enforcement** — alternating white/black turns with visual feedback
+- **Capture mechanics** — opponent pieces are highlighted as capturable targets
+- **Object-oriented game logic** — each piece type is its own TypeScript class with encapsulated movement rules
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+| Layer       | Technology               |
+|-------------|--------------------------|
+| Language    | TypeScript 5.9           |
+| UI          | React 19                 |
+| Bundler     | Vite 8                   |
+| Linting     | ESLint 9 + TypeScript ESLint |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- [Node.js](https://nodejs.org/) (v18 or later recommended)
+- npm
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Installation
+
+```bash
+git clone <repo-url>
+cd chess
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Opens the app at [http://localhost:5173](http://localhost:5173) with hot module replacement.
+
+### Production Build
+
+```bash
+npm run build
+```
+
+Compiles TypeScript and outputs optimized static files to `dist/`.
+
+### Preview Build
+
+```bash
+npm run preview
+```
+
+Serves the production build locally for testing.
+
+### Lint
+
+```bash
+npm run lint
+```
+
+## Project Structure
+
+```
+chess/
+├── public/                     # Static assets (favicon, icons)
+├── src/
+│   ├── assets/                 # Piece sprite PNGs and move indicator
+│   ├── components/
+│   │   ├── Board/
+│   │   │   ├── BoardComponent.tsx   # Main board UI and game loop
+│   │   │   ├── Board.module.css     # Board and cell styling
+│   │   │   └── utils.ts            # Cell data mapping helpers
+│   │   ├── class/
+│   │   │   ├── chessBoard/
+│   │   │   │   └── ChessBoard.ts   # Singleton board state and move orchestration
+│   │   │   ├── chessPieces/
+│   │   │   │   ├── Pawn.ts         # Pawn movement and capture logic
+│   │   │   │   ├── Rook.ts         # Orthogonal ray movement
+│   │   │   │   ├── Knight.ts       # L-shaped movement
+│   │   │   │   ├── Bishop.ts       # Diagonal ray movement
+│   │   │   │   ├── Queen.ts        # Combined rook + bishop movement
+│   │   │   │   └── King.ts         # Single-square movement
+│   │   │   └── types.ts            # Shared interfaces and type definitions
+│   │   └── constants.ts            # Board dimensions and initial piece layout
+│   ├── customHook/
+│   │   └── useModifier.ts          # BEM class name utility hook
+│   ├── App.tsx                     # Root component
+│   └── main.tsx                    # React entry point
+├── index.html                      # HTML shell
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── eslint.config.js
+```
+
+## Architecture
+
+The game logic follows a **singleton board + strategy-per-piece** pattern:
+
+- **`ChessBoard`** is a singleton that owns the 8×8 grid of `IChessCell` objects. It handles selection state, move/capture execution, and dispatches move calculation to the appropriate piece class.
+- **Each piece class** (`Pawn`, `Rook`, `Knight`, `Bishop`, `Queen`, `King`) implements its own move generation logic, marking valid destination cells as highlighted or capturable on the shared board.
+- **`BoardComponent`** is the React layer that renders the board, manages turn state, and triggers re-renders after each move by calling `ChessBoard.performCalculation()`.
+
+## How to Play
+
+1. **White moves first** — click any white piece to select it
+2. **Legal moves appear** — empty destination squares show a dot indicator; capturable enemy pieces are highlighted in red
+3. **Click a destination** to move or capture
+4. **Turns alternate** — after each move, control switches to the other color
+5. Play continues on a single screen (no AI opponent — two human players)
+
+## License
+
+This project is unlicensed. Feel free to use it for learning and experimentation.
