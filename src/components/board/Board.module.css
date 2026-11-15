@@ -1,0 +1,588 @@
+/* ───────── Backdrop: dark walnut gradient ───────── */
+.pageBackground {
+  --ink: #f6ecdc;
+  --ink-dim: rgba(246, 236, 220, 0.66);
+  --glass: rgba(170, 110, 58, 0.16);
+  --glass-strong: rgba(214, 150, 80, 0.28);
+  --glass-line: rgba(238, 192, 130, 0.28);
+  --brass: #dca852;
+  --brass-deep: #a8702a;
+  --light-sq: #ecd3a6;
+  --dark-sq: #a8744a;
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='420' height='420'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.006 0.32' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 0.42  0 0 0 0 0.24  0 0 0 0 0.1  0 0 0 1.1 -0.1'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  color: var(--ink);
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter,
+    Roboto, sans-serif;
+  background:
+    radial-gradient(60vmax 60vmax at 10% 6%, #5c3416 0%, transparent 60%),
+    radial-gradient(55vmax 55vmax at 94% 16%, #3b1d0d 0%, transparent 58%),
+    radial-gradient(60vmax 60vmax at 70% 104%, #7a4619 0%, transparent 60%),
+    #120a06;
+  position: relative;
+  overflow: hidden;
+}
+.ambientGlow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  pointer-events: none;
+  animation: drift 24s ease-in-out infinite alternate;
+}
+.upperLeftGlow {
+  width: 340px;
+  height: 340px;
+  background: #c47a2c;
+  top: 6%;
+  left: 8%;
+}
+.lowerRightGlow {
+  width: 300px;
+  height: 300px;
+  background: #7a3b1c;
+  bottom: 4%;
+  right: 10%;
+  animation-delay: -9s;
+}
+@keyframes drift {
+  to {
+    transform: translate(60px, -40px) scale(1.15);
+  }
+}
+
+/* ───────── macOS window: woody glass ───────── */
+.gameWindow {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, 100%);
+  border-radius: 14px;
+  background: linear-gradient(
+    145deg,
+    rgba(200, 140, 78, 0.28),
+    rgba(70, 38, 18, 0.42)
+  );
+  border: 1px solid var(--glass-line);
+  backdrop-filter: blur(26px) saturate(150%);
+  -webkit-backdrop-filter: blur(26px) saturate(150%);
+  box-shadow:
+    0 40px 90px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 226, 180, 0.3);
+  overflow: hidden;
+}
+/* wood grain laid over the glass */
+.gameWindow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+.titleBar,
+.playLayout,
+.howToPlay {
+  position: relative;
+  z-index: 1;
+}
+
+.titleBar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 10px 14px 0;
+  background: rgba(28, 14, 6, 0.5);
+  border-bottom: 1px solid var(--glass-line);
+}
+.windowControls {
+  display: flex;
+  gap: 8px;
+  padding-bottom: 10px;
+}
+.windowControl {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.3);
+}
+.stopControl {
+  background: #ff5f57;
+}
+.pauseControl {
+  background: #febc2e;
+}
+.resumeControl {
+  background: #28c840;
+}
+
+.tabBar {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+.tab {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 8px 18px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-dim);
+  background: transparent;
+  border-radius: 9px 9px 0 0;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.tab:hover {
+  color: var(--ink);
+  background: rgba(255, 220, 170, 0.08);
+}
+.activeTab {
+  color: var(--ink);
+  background: rgba(214, 150, 80, 0.26);
+  box-shadow: inset 0 1px 0 rgba(255, 226, 180, 0.35);
+}
+.windowTitle {
+  margin-left: auto;
+  padding-bottom: 10px;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+
+/* ───────── Layout ───────── */
+.playLayout {
+  display: grid;
+  grid-template-columns: auto 320px;
+  gap: 28px;
+  padding: 28px;
+  align-items: start;
+}
+
+/* wooden frame around the board */
+.boardFrame {
+  padding: 12px;
+  border-radius: 14px;
+  background:
+    var(--grain), linear-gradient(135deg, #8a5a30, #4e2c14 55%, #70431f);
+  background-blend-mode: soft-light, normal;
+  box-shadow:
+    0 26px 54px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 226, 180, 0.4),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+.boardStage {
+  --size: min(76vh, 620px, calc(100vw - 440px));
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+}
+.chessBoard {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.4);
+}
+.boardLocked .square {
+  cursor: not-allowed;
+}
+
+.boardMessage {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  text-align: center;
+  border-radius: 4px;
+  background: rgba(24, 12, 5, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.boardMessage h2 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.boardMessage p {
+  margin: 0 0 10px;
+  color: var(--ink-dim);
+  font-size: 14px;
+}
+
+/* ───────── Squares ───────── */
+.chessPiece {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 95%;
+  height: 95%;
+  transition: transform 0.15s ease;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.32));
+}
+.square:hover .chessPiece {
+  transform: scale(1.06);
+}
+
+.square {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--light-sq);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+}
+.darkSquare {
+  background-color: var(--dark-sq);
+}
+.selectedSquare {
+  background-color: #f0c85a;
+}
+/* longhands only, so the square colour underneath is never wiped */
+.legalMove {
+  background-image: url("../../assets/allowedPath.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 50%;
+}
+.captureTarget {
+  background-image: radial-gradient(
+    circle at center,
+    transparent 58%,
+    rgba(214, 52, 40, 0.85) 60%
+  );
+  background-size: 100% 100%;
+}
+
+.rankLabel,
+.fileLabel {
+  position: absolute;
+  font-size: clamp(9px, 1.5vmin, 12px);
+  font-weight: 700;
+  pointer-events: none;
+  color: var(--dark-sq);
+}
+.rankLabel {
+  top: 3px;
+  left: 4px;
+}
+.fileLabel {
+  bottom: 2px;
+  right: 4px;
+}
+.darkSquare .rankLabel,
+.darkSquare .fileLabel {
+  color: var(--light-sq);
+}
+
+/* ───────── Side panel ───────── */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 100%;
+}
+
+.infoPanel {
+  border-radius: 16px;
+  background: var(--glass);
+  border: 1px solid var(--glass-line);
+  padding: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 226, 180, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.playerCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition:
+    background 0.25s,
+    box-shadow 0.25s;
+}
+.activePlayer {
+  background: var(--glass-strong);
+  box-shadow:
+    0 0 0 1.5px var(--brass),
+    0 0 26px rgba(220, 168, 82, 0.35);
+}
+.playerAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  line-height: 1;
+}
+.whiteAvatar {
+  background: #f2e8d6;
+  color: #2a1a0c;
+}
+.blackAvatar {
+  background: #2a1a0e;
+  color: #f2e8d6;
+}
+.playerName {
+  font-weight: 650;
+  font-size: 15px;
+}
+.turnLabel {
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+.playerClock {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(24, 12, 5, 0.4);
+  color: var(--ink-dim);
+}
+.runningClock {
+  color: #fff;
+  background: rgba(24, 12, 5, 0.62);
+}
+.lowTimeClock {
+  color: #ff8a7c;
+}
+
+.sectionHeading {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+.timeChoices {
+  display: flex;
+  gap: 8px;
+}
+.timeChoice {
+  flex: 1;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  padding: 9px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: rgba(255, 220, 170, 0.08);
+  border: 1px solid var(--glass-line);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.timeChoice:hover {
+  background: rgba(255, 220, 170, 0.16);
+}
+.timeChoice:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.selectedTime {
+  background: rgba(220, 168, 82, 0.3);
+  border-color: var(--brass);
+}
+
+/* board controls */
+.settingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+.flipButton {
+  width: 100%;
+}
+.autoFlipToggle {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid var(--glass-line);
+  cursor: pointer;
+  background: rgba(24, 12, 5, 0.45);
+  transition: background 0.2s;
+}
+.autoFlipToggle::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f6ecdc;
+  transition: transform 0.2s;
+}
+.autoFlipOn {
+  background: var(--brass-deep);
+}
+.autoFlipOn::after {
+  transform: translateX(18px);
+}
+
+.statusPanel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.statusDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #8a7a68;
+}
+.liveStatusDot {
+  background: var(--brass);
+  box-shadow: 0 0 10px var(--brass);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+.moveCount {
+  margin-left: auto;
+  color: var(--ink-dim);
+  font-size: 13px;
+}
+
+.actionBar {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+.actionButton {
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-line);
+  background: rgba(255, 220, 170, 0.1);
+  cursor: pointer;
+  transition:
+    transform 0.12s,
+    background 0.2s,
+    box-shadow 0.2s;
+}
+.actionButton:hover {
+  background: rgba(255, 220, 170, 0.2);
+}
+.actionButton:active {
+  transform: translateY(2px);
+}
+.primaryButton {
+  color: #2a1706;
+  border-color: transparent;
+  background: linear-gradient(180deg, #efc57a, var(--brass-deep));
+  box-shadow:
+    0 5px 0 #6b4515,
+    0 12px 24px rgba(220, 168, 82, 0.28);
+}
+.primaryButton:hover {
+  background: linear-gradient(180deg, #f6d28f, #b97d2f);
+}
+.primaryButton:active {
+  box-shadow: 0 2px 0 #6b4515;
+  transform: translateY(3px);
+}
+.stopButton {
+  background: linear-gradient(180deg, #ff7d72, #c9413a);
+  box-shadow:
+    0 5px 0 #7d2620,
+    0 12px 24px rgba(235, 64, 52, 0.26);
+  border-color: transparent;
+  color: #fff;
+}
+.buttonRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.howToPlay {
+  max-width: 560px;
+  margin: 0;
+  padding: 28px;
+  line-height: 1.7;
+}
+.howToPlay h2 {
+  margin-top: 0;
+  letter-spacing: -0.02em;
+}
+.howToPlay li {
+  margin-bottom: 6px;
+  color: var(--ink-dim);
+}
+.howToPlay b {
+  color: var(--ink);
+}
+
+.actionButton:focus-visible,
+.timeChoice:focus-visible,
+.tab:focus-visible,
+.windowControl:focus-visible,
+.autoFlipToggle:focus-visible {
+  outline: 2px solid #f4d9a2;
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .playLayout {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 16px;
+  }
+  .boardStage {
+    --size: min(86vw, 560px);
+  }
+  .sidebar {
+    width: min(92vw, 560px);
+  }
+  .windowTitle {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ambientGlow,
+  .liveStatusDot {
+    animation: none;
+  }
+  .chessPiece,
+  .actionButton,
+  .autoFlipToggle::after {
+    transition: none;
+  }
+}

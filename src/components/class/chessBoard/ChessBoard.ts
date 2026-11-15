@@ -11,10 +11,13 @@ import { Knight } from "../chessPieces/Knight";
 import { Pawn } from "../chessPieces/Pawn";
 import { Queen } from "../chessPieces/Queen";
 import { Rook } from "../chessPieces/Rook";
+import { ChessSide } from "./chessSide/ChessSide";
+
 import type {
   IBishop,
+  IChessBoard,
   IChessCell,
-  IGamePieces,
+  IChessSide,
   IKing,
   IKnight,
   IPawn,
@@ -22,10 +25,14 @@ import type {
   IRook,
 } from "../types";
 
-export class ChessBoard implements IGamePieces {
+import { PieceType } from "../types";
+
+export class ChessBoard implements IChessBoard {
   private static instance: ChessBoard;
 
   public cells: IChessCell[][] = [];
+  public whiteSide: IChessSide;
+  public blackSide: IChessSide;
   public pawn: IPawn;
   public rook: IRook;
   public knight: IKnight;
@@ -37,13 +44,23 @@ export class ChessBoard implements IGamePieces {
     this.initCells();
     this.fillBoardCells(0, "black", 1);
     this.fillBoardCells(BOARD_ROWS - 1, "white", -1);
-
     this.pawn = new Pawn(this);
     this.rook = new Rook(this);
     this.knight = new Knight(this);
     this.bishop = new Bishop(this);
     this.queen = new Queen();
     this.king = new King(this);
+    this.whiteSide = new ChessSide();
+    this.blackSide = new ChessSide();
+    window.addEventListener("gameOver", (event: Event) => {
+      const side = (event as CustomEvent<string>).detail;
+      window.alert(`${side} wins!`);
+    });
+
+    window.addEventListener("upgradePawn", (event: Event)=>{
+      const updateContext = event as CustomEvent<{rowIdx: number, colIdx: number, piece: PieceType}>;
+      this.upgradePawn(updateContext.detail.rowIdx,updateContext.detail.colIdx,updateContext.detail.piece);
+    });
   }
 
   public static getInstance(): ChessBoard {
@@ -51,6 +68,10 @@ export class ChessBoard implements IGamePieces {
       ChessBoard.instance = new ChessBoard();
     }
     return ChessBoard.instance;
+  }
+
+  private upgradePawn(rowIdx: number, colIdx: number, piece: PieceType): void {
+    this.cells[rowIdx][colIdx].piece = piece;
   }
 
   private initCells() {
@@ -67,13 +88,7 @@ export class ChessBoard implements IGamePieces {
 
   private addPiece(side: string, piece: string, cell: IChessCell): IChessCell {
     cell.side = side as "black" | "white";
-    cell.piece = piece as
-      | "pawn"
-      | "rook"
-      | "knight"
-      | "bishop"
-      | "queen"
-      | "king";
+    cell.piece = piece as PieceType;
     cell.isEmpty = false;
     return cell;
   }
@@ -141,13 +156,16 @@ export class ChessBoard implements IGamePieces {
     } as IChessCell;
   }
 
-  public resetPossibleMoves(): void {
+  public resetPossibleMoves(resetEnPassant: boolean = false): void {
     for (let row = 0; row < BOARD_ROWS; row++) {
       for (let col = 0; col < BOARD_COLUMNS; col++) {
         const cell = this.cells[row][col];
         cell.isCaptureable = false;
         cell.isHighLighted = false;
         cell.isSelected = false;
+        if (resetEnPassant) {
+          cell.isEnPassant = false;
+        }
       }
     }
   }
@@ -161,7 +179,10 @@ export class ChessBoard implements IGamePieces {
     );
   }
 
-  public captureCell(currentCell: IChessCell, attackerCell: IChessCell): void {
+  public setCaptureable(
+    currentCell: IChessCell,
+    attackerCell: IChessCell,
+  ): void {
     if (currentCell.side !== attackerCell.side && attackerCell.piece !== "") {
       currentCell.isCaptureable = true;
     }
@@ -177,27 +198,37 @@ export class ChessBoard implements IGamePieces {
     if (currentCell.isEmpty) {
       currentCell.isHighLighted = true;
     } else {
-      this.captureCell(currentCell, cell);
+      this.setCaptureable(currentCell, cell);
     }
   }
 
-  private checkIfPossible(targetCell: IChessCell, initialCell: IChessCell) {
+  private movePieceToCell(targetCell: IChessCell, initialCell: IChessCell) {
+    if (initialCell.piece === PieceType.PAWN) {
+      const initialRow = initialCell.row;
+      const initialCol = initialCell.column;
+      const targetRow = targetCell.row;
+      const targetCol = targetCell.column;
+      const direction = initialCell.side === "white" ? 2 : -2;
+
+      if (initialRow + direction === targetRow && initialCol === targetCol) {
+        initialCell.isEnPassant = true;
+      }
+    }
+
     targetCell.piece = initialCell.piece;
     targetCell.side = initialCell.side;
     targetCell.isEmpty = false;
-    initialCell.piece = "";
+    initialCell.piece = PieceType.EMPTY;
     initialCell.side = "";
     initialCell.isEmpty = true;
     targetCell.hasMoved = true;
+
     this.resetPossibleMoves();
   }
 
-  private makeCapturePossible(
-    targetCell: IChessCell,
-    attackerCell: IChessCell,
-  ): void {
+  private captureCell(targetCell: IChessCell, attackerCell: IChessCell): void {
     targetCell.piece = attackerCell.piece;
-    attackerCell.piece = "";
+    attackerCell.piece = PieceType.EMPTY;
     attackerCell.isEmpty = true;
     targetCell.side = attackerCell.side;
     attackerCell.side = "";
@@ -211,7 +242,7 @@ export class ChessBoard implements IGamePieces {
       for (let j = 0; j < BOARD_COLUMNS; j++) {
         const cell = this.cells[i][j];
         if (cell.isSelected && !cell.isEmpty) {
-          this.checkIfPossible(moveAbleCell, cell);
+          this.movePieceToCell(moveAbleCell, cell);
           break;
         }
       }
@@ -224,15 +255,55 @@ export class ChessBoard implements IGamePieces {
       for (let j = 0; j < BOARD_COLUMNS; j++) {
         const cell = this.cells[i][j];
         if (cell.isSelected) {
-          this.makeCapturePossible(capturableCell, cell);
+          this.captureCell(capturableCell, cell);
         }
       }
     }
   }
 
-  public performCalculation(rowIdx: number, colIdx: number): boolean {
+  // private canKingMakeMove(rowIdx: number, colIdx: number): boolean {
+  //   const currentSide = this.cells[rowIdx][colIdx].side;
+
+  //   const boardMap = new Map<number, boolean>();
+  //   const kingRow = -1;
+  //   const kingCol = -1;
+
+  //   for (let i = 0; i < BOARD_ROWS; i++) {
+  //     for (let j = 0; j < BOARD_COLUMNS; j++) {
+  //       const cell = this.cells[i][j];
+  //       if (cell.piece === PieceType.KING) {
+  //       }
+  //     }
+  //   }
+  // }
+
+  private checkKingsStatus(): void {}
+
+  public performCalculation(
+    rowIdx: number,
+    colIdx: number,
+    side: "white" | "black",
+  ): boolean {
     const cell = this.cells[rowIdx][colIdx];
-    console.log(cell);
+
+    // if (canKingMakeMove(rowIdx, colIdx)) {
+    // }
+
+    if (cell.isPinned) {
+      return false;
+    }
+
+    if (
+      (side === "white" && this.whiteSide.isKingUnderAttack) ||
+      (side === "black" && this.blackSide.isKingUnderAttack)
+    ) {
+      return false;
+    }
+
+    // if(side === "white" && this.whiteSide.isKingUnderAttack || side === "black" && this.blackSide.isKingUnderAttack){
+
+    // }
+
     if (cell.isEmpty && cell.isHighLighted) {
       this.makeMove(rowIdx, colIdx);
       return true;
@@ -248,22 +319,22 @@ export class ChessBoard implements IGamePieces {
     this.resetPossibleMoves();
     cell.isSelected = true;
     switch (cell.piece) {
-      case "pawn":
+      case PieceType.PAWN:
         this.pawn.callPawn(rowIdx, colIdx);
         break;
-      case "rook":
+      case PieceType.ROOK:
         this.rook.callRook(rowIdx, colIdx);
         break;
-      case "knight":
+      case PieceType.KNIGHT:
         this.knight.callKnight(rowIdx, colIdx);
         break;
-      case "bishop":
+      case PieceType.BISHOP:
         this.bishop.callBishop(rowIdx, colIdx);
         break;
-      case "queen":
+      case PieceType.QUEEN:
         this.queen.callQueen(rowIdx, colIdx, this.rook, this.bishop);
         break;
-      case "king":
+      case PieceType.KING:
         this.king.callKing(rowIdx, colIdx);
         break;
       default:

@@ -15,7 +15,7 @@ export class Rook implements IRook {
       if (cell.isEmpty) {
         cell.isHighLighted = true;
       } else {
-        this.board.captureCell(cell, currentCell);
+        this.board.setCaptureable(cell, currentCell);
         break;
       }
     }
@@ -28,7 +28,7 @@ export class Rook implements IRook {
       if (cell.isEmpty) {
         cell.isHighLighted = true;
       } else {
-        this.board.captureCell(cell, currentCell);
+        this.board.setCaptureable(cell, currentCell);
         break;
       }
     }
@@ -41,7 +41,7 @@ export class Rook implements IRook {
       if (cell.isEmpty) {
         cell.isHighLighted = true;
       } else {
-        this.board.captureCell(cell, currentCell);
+        this.board.setCaptureable(cell, currentCell);
         break;
       }
     }
@@ -54,7 +54,7 @@ export class Rook implements IRook {
       if (cell.isEmpty) {
         cell.isHighLighted = true;
       } else {
-        this.board.captureCell(cell, currentCell);
+        this.board.setCaptureable(cell, currentCell);
         break;
       }
     }

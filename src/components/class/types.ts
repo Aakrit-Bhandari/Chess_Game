@@ -1,6 +1,6 @@
 export interface IChessCell {
-  piece: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "";
-  side: "black" | "white" | "";
+  piece: PieceType;
+  side: IPlayerTurn;
   row: number;
   column: number;
   plateColor: boolean; //light true, dark false
@@ -9,25 +9,50 @@ export interface IChessCell {
   isHighLighted: boolean;
   isMovable: boolean;
   isCaptureable: boolean;
+  //en passant
   hasMoved: boolean;
+  isEnPassant: boolean;
+  cellData: string;
+  isPinned: boolean;
 }
 
 export type IPlayerTurn = "white" | "black" | "";
 
+export type PlayerTurn = Omit<IPlayerTurn, "">;
+
+export enum PieceType {
+  PAWN = "pawn",
+  ROOK = "rook",
+  QUEEN = "queen",
+  KING = "king",
+  BISHOP = "bishop",
+  KNIGHT = "knight",
+  EMPTY = "",
+}
+
 export interface IBoardContext {
   cells: IChessCell[][];
   isValidPosition(rowIdx: number, colIdx: number): boolean;
-  captureCell(currentCell: IChessCell, attackerCell: IChessCell): void;
+  setCaptureable(currentCell: IChessCell, attackerCell: IChessCell): void;
   commonCellValidation(cell: IChessCell, rowIdx: number, colIdx: number): void;
+}
+
+export interface IChessSide {
+  isKingUnderAttack: boolean;
+  // pathLeadingToKingCapture: [];
+  // attackingPieceX: number;
+  // attackingPieceY: number;
 }
 
 export interface IChessBoard extends IGamePieces {
   cells: IChessCell[][];
+  whiteSide: IChessSide;
+  blackSide: IChessSide;
 }
 
 export interface ICellData {
-  side: "black" | "white" | "";
-  piece: "pawn" | "rook" | "knight" | "bishop" | "queen" | "king" | "";
+  side: IPlayerTurn;
+  piece: PieceType;
   isCaptureable: boolean;
   highLighted: boolean;
   darkCell: boolean;

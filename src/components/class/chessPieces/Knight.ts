@@ -17,7 +17,7 @@ export class Knight implements IKnight {
       if (attackedCell.isEmpty) {
         attackedCell.isHighLighted = true;
       }
-      this.board.captureCell(attackedCell, attackerCell);
+      this.board.setCaptureable(attackedCell, attackerCell);
     }
   }
 

@@ -38,7 +38,7 @@ export class King implements IKing {
     const currentCell = this.board.cells[rowIdx][colIdx];
     this.board.commonCellValidation(currentCell, rowIdx + 1, colIdx);
   }
-
+  
   public callKing(rowIdx: number, colIdx: number) {
     this.moveKingBottomDirection(rowIdx, colIdx);
     this.moveKingLeftDirection(rowIdx, colIdx);

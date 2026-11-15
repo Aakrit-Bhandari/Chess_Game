@@ -1,4 +1,5 @@
 import type { ICellData, IChessCell } from "../class/types";
+// import { IChessBoard } from "../class/types";
 
 export const getCellData = (cell: IChessCell): ICellData => {
   const side = cell.side;
@@ -12,3 +13,7 @@ export const getCellData = (cell: IChessCell): ICellData => {
 
 // export const makeClass = (cell: IChessCell, styles: CSSModuleClasses) => {
 // };
+
+// export const boardSummary = (board:IChessBoard){
+
+// }

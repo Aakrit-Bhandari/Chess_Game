@@ -1,5 +1,6 @@
 import { BOARD_ROWS } from "../../constants";
 import type { IBoardContext, IPawn } from "../types";
+import { PieceType } from "../types";
 
 export class Pawn implements IPawn {
   private board: IBoardContext;
@@ -29,13 +30,42 @@ export class Pawn implements IPawn {
     if (this.board.isValidPosition(rowIdx + forward, colIdx - 1)) {
       const adjacentCell = this.board.cells[rowIdx + forward][colIdx - 1];
       if (!adjacentCell.isEmpty && adjacentCell.side !== side) {
-        this.board.captureCell(adjacentCell, currentCell);
+        this.board.setCaptureable(adjacentCell, currentCell);
       }
     }
     if (this.board.isValidPosition(rowIdx + forward, colIdx + 1)) {
       const adjacentCell = this.board.cells[rowIdx + forward][colIdx + 1];
       if (!adjacentCell.isEmpty && adjacentCell.side !== side) {
-        this.board.captureCell(adjacentCell, currentCell);
+        this.board.setCaptureable(adjacentCell, currentCell);
+      }
+    }
+
+    //enPassantChecks
+    //Left side check -> Same Row and a row behind
+    if (this.board.isValidPosition(rowIdx, colIdx - 1)) {
+      const adjacentCell = this.board.cells[rowIdx][colIdx - 1];
+      if (adjacentCell.piece === PieceType.PAWN) {
+        this.board.setCaptureable(adjacentCell, currentCell);
+      }
+    }
+    if (this.board.isValidPosition(rowIdx + forward * -1, colIdx - 1)) {
+      const adjacentCell = this.board.cells[rowIdx + forward * -1][colIdx - 1];
+      if (adjacentCell.piece === PieceType.PAWN) {
+        this.board.setCaptureable(adjacentCell, currentCell);
+      }
+    }
+
+    //Right side check -> Same Row and a row ahead
+    if (this.board.isValidPosition(rowIdx + forward * -1, colIdx + 1)) {
+      const adjacentCell = this.board.cells[rowIdx + forward * -1][colIdx + 1];
+      if (adjacentCell.piece === PieceType.PAWN) {
+        this.board.setCaptureable(adjacentCell, currentCell);
+      }
+    }
+    if (this.board.isValidPosition(rowIdx, colIdx + 1)) {
+      const adjacentCell = this.board.cells[rowIdx][colIdx + 1];
+      if (adjacentCell.piece === PieceType.PAWN) {
+        this.board.setCaptureable(adjacentCell, currentCell);
       }
     }
   }
