@@ -277,7 +277,7 @@ export class ChessBoard implements IChessBoard {
   //   }
   // }
 
-  private checkKingsStatus(): void {}
+  // private checkKingsStatus(): void {}
 
   public performCalculation(
     rowIdx: number,
